@@ -12,6 +12,7 @@ app.get("/", (request, response) => {
   //send 'Hi, from Node server' to client
   response.send("Hi, from Node server");
 });
+// api to get commit
 app.get("/repositories/:owner/:repository/commits/:commitId", async(request, response) => {
     try{
         const params = request.params;
@@ -23,7 +24,7 @@ app.get("/repositories/:owner/:repository/commits/:commitId", async(request, res
             });
         }
         config = await prepareConfig(params,'get-commit')
-        commitData = await axiosCall(config,'get-commit')        
+        commitData = await axiosCall(config)
         response.json(commitData);
     }
     catch(error){
@@ -32,6 +33,8 @@ app.get("/repositories/:owner/:repository/commits/:commitId", async(request, res
           });
     }
   });
+
+  // api to get commit diff
   app.get("/repositories/:owner/:repository/commits/:base...:head/diff", async(request, response) => {
     try{
         const params = request.params;
@@ -43,7 +46,7 @@ app.get("/repositories/:owner/:repository/commits/:commitId", async(request, res
             });
         }
         config = await prepareConfig(params,'get-commit-diff')
-        commitDiffData = await axiosCall(config,'get-commit')
+        commitDiffData = await axiosCall(config)
         response.json(commitDiffData);
     }
     catch(error){
@@ -59,7 +62,8 @@ app.listen(port, () =>
   console.log(`server is listening at http://localhost:${port}`)
 );
 
-const axiosCall = async(config,requestName)=>{
+// common axios call function pass
+const axiosCall = async(config)=>{
     let result = {};
    try{
         await axios.request(config).then((response) => {
@@ -75,7 +79,7 @@ const axiosCall = async(config,requestName)=>{
     return result;
    }
 }
-
+// validate the url
 const validationparams = async(data,requestName)=>{
     let validataion = true;
     const owner = get(data.owner,'');
@@ -93,7 +97,7 @@ const validationparams = async(data,requestName)=>{
     }
     return validataion; 
 }
-    
+ // prepare axios config   
 const prepareConfig = async(data,requestName)=>{
     let config = {};
     //git hub baseurl and basic req config
